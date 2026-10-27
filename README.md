@@ -32,15 +32,12 @@ in clean-motion space, never in v-space, where the correction would be divided b
 trained by a single source-anchor loss and needs no localisation labels.
 
 <div align="center">
-
-| How much is copied | Which joints are copied |
-|---|---|
-| <img src="assets/gate_vs_edit.png" width="380"> | <img src="assets/gate_per_joint.png" width="380"> |
-
+  <img src="assets/framework.png" width="100%">
 </div>
 
-The field copies as much as the edit allows: on the smallest quarter of edits it reuses 3.1× more of the
-source than on the largest. Lower-body joints are copied most and arms least, at every edit size.
+The denoiser reads the source motion and the instruction, and produces two outputs per frame: the pose
+itself and the preservation field. Blending the two against the time-aligned source is what keeps the
+untouched parts of the motion intact.
 
 > This repository contains the **inference code and the released checkpoint** for
 > [SuperMotion](https://arxiv.org/abs/2610.01517) ([paper](https://arxiv.org/pdf/2610.01517), [project page](https://harlanhong.github.io/Projects/SuperMotion/index.html)).
