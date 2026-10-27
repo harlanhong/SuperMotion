@@ -1,0 +1,12 @@
+- experiment=cls_arch_v2
+- run_id=anchorx0_sig_c3_s1
+- model.anchor_x0_gate=true
+- model.anchor_gate_mode=sigmoid
+- model.diff_params.snr_gamma=null
+- model.uniform_tsteps=true
+- model.hf_loss_coef=0.5
+- trainer.check_val_every_n_epoch=100
+- callback.latest_ckpt.save_top_k=1
+- seed=1
+- model.anchor_x0_coef=3.0
+- ftune_partial=experiments/new_code/cls_arch_v2/vpred_skip_nosnr_uni_hf

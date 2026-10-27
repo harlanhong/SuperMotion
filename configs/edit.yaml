@@ -1,0 +1,36 @@
+hydra:
+  run:
+    dir: .
+  job:
+    chdir: true
+  output_subdir: null
+
+# run directory holding .hydra/config.yaml and checkpoints/last.ckpt
+folder: ???
+ckpt_name: 'last'
+last_ckpt_path: ${get_last_checkpoint:${folder},${ckpt_name}}
+logger_level: INFO
+
+keyid: ???            # MotionFix id of the source motion, or a comma-separated list
+text: null            # edit instruction; null = the instruction that comes with the motion
+out_dir: outputs      # where the edited motions are written
+
+# sampling (same meaning as in motionfix_eval.yaml)
+prob_way: '3way'
+guidance_scale_text_n_motion: 3.0
+guidance_scale_motion: 3.0
+num_sampling_steps: 1000
+init_from: 'noise'
+condition_mode: 'full_cond'
+field_scale: 1.0
+
+defaults:
+  - _self_
+  - data: motionfix
+  - /path@path
+  - override hydra/job_logging: rich
+  - override hydra/hydra_logging: rich
+
+split_to_load:
+- "test"
+- "val"

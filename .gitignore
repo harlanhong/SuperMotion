@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+# large assets fetched or produced locally (see README "Setup")
+data
+deps
+eval-deps
+checkpoints/*/checkpoints/*.ckpt
+checkpoints/*/3way_*/
+outputs*/
+mfix-env/
+*.log

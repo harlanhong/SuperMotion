@@ -1,0 +1,299 @@
+data:
+  dataname: motionfix
+  _target_: src.data.motionfix.MotionFixDataModule
+  debug: ${debug}
+  datapath: ${path.data}/motionfix-dataset/motionfix.pth.tar
+  smplh_path: ${path.data}/body_models
+  smplh_path_dbg: ${path.minidata}/body_models
+  load_with_rot: true
+  load_splits:
+  - train
+  - val
+  - test
+  proportion: 1.0
+  text_augment: false
+  batch_size: ${machine.batch_size}
+  num_workers: ${machine.num_workers}
+  rot_repr: 6d
+  preproc:
+    stats_file: ${path.deps}/stats/statistics_${data.dataname}.npy
+    split_seed: 0
+    calculate_minmax: true
+    generate_joint_files: true
+    use_cuda: true
+    n_body_joints: 22
+    norm_type: std
+    sim_file: ${path.data}/scores_v3.npz
+  framerate: 30
+  sampler: ${sampler}
+  load_feats:
+  - body_transl_delta_pelv
+  - body_orient_xy
+  - z_orient_delta
+  - body_pose
+  - body_joints_local_wo_z_rot
+  - body_transl
+  - body_orient
+  progress_bar: true
+model:
+  modelname: basic_clip_repr
+  _target_: src.model.base_diffusion.MD
+  latent_dim: 512
+  ff_size: 1024
+  num_layers: 9
+  num_head: 8
+  droupout: 0.1
+  activation: gelu
+  render_vids_every_n_epochs: 100
+  num_vids_to_render: 2
+  lr_scheduler: null
+  zero_len_source: false
+  old_way: false
+  statistics_path: ${statistics_path}
+  norm_type: standardize
+  use_cls: true
+  use_repr: false
+  use_v_weight: true
+  source_align_coef: 0
+  target_align_coef: 0
+  cls_coef: 0.05
+  hf_loss_coef: 0.5
+  uniform_tsteps: true
+  kw_align_coef: 0.0
+  gate_coef: 0.05
+  gate_hard_target: false
+  gate_commit_coef: 0.0
+  spatial_gate: false
+  text2parts_file: ${path.data}/text2parts.json
+  edit_sup_coef: 0.0
+  freeze_except_gate: false
+  gate_detach_src: false
+  residual_edit: false
+  source_anchored: false
+  freq_decomp: false
+  anchor_x0_gate: true
+  anchor_x0_coef: 3.0
+  anchor_gate_mode: sigmoid
+  anchor_field_dim: full
+  anchor_zero_init: true
+  anchor_align: linear
+  kw_file: ${path.data}/keywords_v1.json
+  n_cls: 3
+  target_align_depth: 6
+  diff_params:
+    num_inference_timesteps: 200
+    num_train_timesteps: 300
+    prob_uncondp: 0.05
+    prob_drop_text: 0.05
+    prob_drop_motion: 0.05
+    guidance_scale_text: 2.5
+    guidance_scale_motion: 2.0
+    noise_schedule: squaredcos_cap_v2
+    predict_type: v
+    snr_gamma: null
+  motion_condition: source
+  source_encoder: null
+  condition: text
+  smpl_path: ${data.smplh_path}
+  copy_target: false
+  nfeats: 135
+  dim_per_feat:
+  - 135
+  input_feats:
+  - body_transl_delta_pelv
+  - body_orient_xy
+  - z_orient_delta
+  - body_pose
+  - body_joints_local_wo_z_rot
+  pad_inputs: false
+  loss_func_pos: mse
+  loss_func_feats: mse
+  path:
+    deps: ${code_path:./deps}
+    data: ${code_path:./data}
+    minidata: ${code_path:./minidata}
+    code_dir: ${code_path:}
+    working_dir: ${working_path:""}
+    minilog: ${code_path:./miniexperiments}
+  train_scheduler:
+    _target_: diffusers.DDPMScheduler
+    num_train_timesteps: 1000
+    beta_start: 0.00085
+    beta_end: 0.012
+    beta_schedule: squaredcos_cap_v2
+    variance_type: fixed_small
+    clip_sample: false
+    prediction_type: sample
+  infer_scheduler:
+    _target_: diffusers.DDPMScheduler
+    num_train_timesteps: 1000
+    beta_start: 0.00085
+    beta_end: 0.012
+    beta_schedule: squaredcos_cap_v2
+    variance_type: fixed_small
+    clip_sample: false
+    prediction_type: sample
+  denoiser:
+    _target_: src.model.DiT_denoiser_cls_arch.DiT_Denoiser_CLS_Arch
+    text_encoded_dim: 768
+    ff_size: 1024
+    num_layers: 8
+    num_heads: 8
+    dropout: 0.1
+    activation: gelu
+    condition: ${model.condition}
+    motion_condition: ${model.motion_condition}
+    latent_dim: ${model.latent_dim}
+    nfeats: ${model.nfeats}
+    use_sep: true
+    pred_delta_motion: false
+    repr_dim: 256
+    n_cls: 3
+    encoder_layers: 4
+    ablation: no_text
+    use_long_skips: true
+    use_kw_align: false
+    use_identity_gate: false
+    predict_type: ${model.diff_params.predict_type}
+    spatial_gate: false
+    source_anchored: ${model.source_anchored}
+    freq_decomp: ${model.freq_decomp}
+    anchor_x0_gate: ${model.anchor_x0_gate}
+    anchor_gate_mode: ${model.anchor_gate_mode}
+    anchor_field_dim: ${model.anchor_field_dim}
+    anchor_zero_init: ${model.anchor_zero_init}
+    anchor_align: ${model.anchor_align}
+  text_encoder:
+    _target_: src.model.textencoder.clip_encoder.ClipTextEncoder
+    finetune: false
+    last_hidden_state: false
+    modelpath: ${path.deps}/clip-vit-large-patch14
+  motion_condition_encoder:
+    name: actor_encoder
+    _target_: src.model.motionencoder.ActorAgnosticEncoder
+    latent_dim: ${model.latent_dim}
+    ff_size: ${model.ff_size}
+    num_layers: ${model.num_layers}
+    num_head: ${model.num_head}
+    droupout: ${model.droupout}
+    activation: ${model.activation}
+    nfeats: ${model.nfeats}
+  losses:
+    _target_: src.model.losses.MLDLosses
+    lmd_rfeats_recons: 1.0
+    lmd_jfeats_recons: 1.0
+    predict_epsilon: false
+    modelname: ${model.modelname}
+    lmd_latent: 1.0e-05
+    lmd_kl: 1.0e-05
+    lmd_prior: 0.0
+    lmd_recons: 1.0
+    lmd_gen: 1.0
+    fuse: concat
+    loss_on_both: true
+    loss_on_jfeats: false
+    ablation_no_kl_combine: false
+    ablation_no_kl_gaussian: false
+    ablation_no_motionencoder: false
+  optim:
+    _target_: torch.optim.AdamW
+    lr: 0.0001
+    lr_final: 1.0e-06
+    t_warmup: 150
+  func_recons:
+    _target_: src.model.losses.recons.Recons
+  func_latent:
+    _target_: src.model.losses.recons.Recons
+  func_kl:
+    _target_: src.model.losses.KLLoss
+machine:
+  name: server
+  batch_size: 128
+  smpl_batch_size: 64
+  num_workers: 16
+trainer:
+  strategy: null
+  benchmark: true
+  max_epochs: 1501
+  accelerator: gpu
+  log_every_n_steps: 40
+  deterministic: false
+  detect_anomaly: false
+  enable_progress_bar: true
+  check_val_every_n_epoch: 100
+  limit_train_batches: 1.0
+  limit_val_batches: 1.0
+  num_sanity_val_steps: 0
+  precision: 32
+sampler:
+  _target_: src.data.sampling.FrameSampler
+  request_frames: 300
+  sampling: conseq
+  sampling_step: 1
+  threshold_reject: 0.75
+  max_len: 600
+  min_len: 15
+logger:
+  logger_name: tensorboard
+  save_dir: tensorboard
+  version: ''
+  log_graph: false
+  default_hp_metric: false
+  project: null
+callback:
+  last_ckpt:
+    _target_: pytorch_lightning.callbacks.ModelCheckpoint
+    dirpath: ${path.working_dir}/checkpoints
+    filename: latest-{epoch}
+    every_n_epochs: 1
+    save_top_k: 1
+    save_last: true
+  latest_ckpt:
+    _target_: pytorch_lightning.callbacks.ModelCheckpoint
+    dirpath: ${path.working_dir}/checkpoints
+    filename: latest-{epoch}
+    monitor: step
+    mode: max
+    every_n_epochs: 100
+    save_top_k: 1
+    save_last: false
+  progress:
+    _target_: src.callback.ProgressLogger
+  render:
+    _target_: src.callback.RenderCallback
+    every_n_epochs: 50
+    num_workers: ${machine.num_workers}
+    save_last: true
+    nvids_to_save: 3
+    bm_path: ${path.data}
+    modelname: ${model.modelname}
+  lr_logging:
+    _target_: pytorch_lightning.callbacks.LearningRateMonitor
+    logging_interval: epoch
+path:
+  deps: ${code_path:./deps}
+  data: ${code_path:./data}
+  minidata: ${code_path:./minidata}
+  code_dir: ${code_path:}
+  working_dir: ${working_path:""}
+  minilog: ${code_path:./miniexperiments}
+debug: false
+expdir: ${get_expdir:${debug}}
+experiment: cls_arch_v2
+project: new_code
+seed: 1
+logger_level: INFO
+run_id: anchorx0_sig_c3_s1
+resume: ${working_path:${expdir}/${project}/${experiment}/${run_id}/}
+resume_ckpt_name: last
+renderer: null
+watch_model: false
+log_freq: 1000
+log: all
+devices: 1
+ftune: null
+ftune_partial: experiments/new_code/cls_arch_v2/vpred_skip_nosnr_uni_hf
+ftune_ckpt_name: last
+ftune_ckpt_path: ${get_last_checkpoint:${ftune},${ftune_ckpt_name}}
+statistics_file: statistics_${data.dataname}${get_debug:${debug}}.npy
+statistics_path: ${path.deps}/stats/${statistics_file}
