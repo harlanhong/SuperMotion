@@ -3,8 +3,9 @@
 Text-driven 3D human motion editing: given a **source motion** and an **edit instruction**, produce the
 edited motion while preserving everything the instruction does not ask to change.
 
-This repository contains the **inference code and the released checkpoint** for SuperMotion. Training
-code is not included.
+This repository contains the **inference code and the released checkpoint** for
+[SuperMotion: Source-Preserving Denoising for Text-Driven Human Motion Editing](https://arxiv.org/abs/2610.01517)
+(arXiv:2610.01517). Training code is not included.
 
 The model is a v-prediction DiT with U-ViT long skip connections and a **preservation field**
 g ∈ (0,1)^(T×D). At every reverse step the clean-motion estimate is re-anchored to the time-aligned
@@ -169,11 +170,11 @@ the MotionFix dataset, CLIP and the TMR evaluator are covered by their respectiv
 ## Citation
 
 ```bibtex
-@inproceedings{supermotion2027,
-  title     = {Source-Preserving Denoising for Text-Driven Human Motion Editing},
-  author    = {Fa-Ting Hong and Peter Wonka},
-  booktitle = {International Conference on Learning Representations (ICLR)},
-  year      = {2027}
+@article{hong2026supermotion,
+  title   = {SuperMotion: Source-Preserving Denoising for Text-Driven Human Motion Editing},
+  author  = {Fa-Ting Hong and Peter Wonka},
+  journal = {arXiv preprint arXiv:2610.01517},
+  year    = {2026}
 }
 ```
 
