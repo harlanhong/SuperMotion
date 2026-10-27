@@ -1,7 +1,7 @@
 <p align="center">
 <strong>SuperMotion: Source-Preserving Denoising for Text-Driven Human Motion Editing</strong>
   <p align="center">
-    <a href='https://github.com/harlanhong' target='_blank'>Fa-Ting Hong</a>&emsp;
+    <a href='https://harlanhong.github.io/' target='_blank'>Fa-Ting Hong</a>&emsp;
     <a href='https://peterwonka.net/' target='_blank'>Peter Wonka</a>&emsp;
     <br>
     KAUST
@@ -11,8 +11,12 @@
 <p align="center">
   <a href='https://arxiv.org/abs/2610.01517'>
     <img src='https://img.shields.io/badge/Arxiv-2610.01517-A42C25?style=flat&logo=arXiv&logoColor=A42C25'></a>
+  <a href='https://arxiv.org/pdf/2610.01517'>
+    <img src='https://img.shields.io/badge/Paper-PDF-blue?style=flat&logo=adobeacrobatreader&logoColor=white'></a>
   <a href='https://github.com/harlanhong/SuperMotion'>
     <img src='https://img.shields.io/badge/GitHub-Code-black?style=flat&logo=github&logoColor=white'></a>
+  <a href='https://harlanhong.github.io/Projects/SuperMotion/index.html'>
+    <img src='https://img.shields.io/badge/Project-Page-green?style=flat&logo=Google%20chrome&logoColor=green'></a>
 </p>
 
 Given a **source motion** and an **edit instruction**, SuperMotion produces the edited motion while
@@ -38,7 +42,9 @@ trained by a single source-anchor loss and needs no localisation labels.
 The field copies as much as the edit allows: on the smallest quarter of edits it reuses 3.1× more of the
 source than on the largest. Lower-body joints are copied most and arms least, at every edit size.
 
-> This repository contains the **inference code and the released checkpoint**. Training code is not included.
+> This repository contains the **inference code and the released checkpoint** for
+> [SuperMotion](https://arxiv.org/abs/2610.01517) ([paper](https://arxiv.org/pdf/2610.01517), [project page](https://harlanhong.github.io/Projects/SuperMotion/index.html)).
+> Training code is not included.
 
 ## Results
 
