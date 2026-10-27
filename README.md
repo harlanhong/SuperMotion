@@ -171,7 +171,7 @@ the MotionFix dataset, CLIP and the TMR evaluator are covered by their respectiv
 ```bibtex
 @inproceedings{supermotion2027,
   title     = {Source-Preserving Denoising for Text-Driven Human Motion Editing},
-  author    = {<authors>},
+  author    = {Fa-Ting Hong and Peter Wonka},
   booktitle = {International Conference on Learning Representations (ICLR)},
   year      = {2027}
 }
